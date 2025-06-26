@@ -129,9 +129,9 @@ Utilizando o mesmo `input.txt` com 25 valores:
 
 | Comando                                  | Saída Esperada        |
 |------------------------------------------|------------------------|
-| `python pway_sort.py 2 input.txt out`    | `25  2  7  3`          |
-| `python pway_sort.py 3 input.txt out`    | `25  3  5  2`          |
-| `python pway_sort.py 4 input.txt out`    | `25  4  4  1`          |
+| `python pway_sort.py 2 input.txt output.txt`    | `25  2  7  3`          |
+| `python pway_sort.py 3 input.txt output.txt`    | `25  3  5  2`          |
+| `python pway_sort.py 4 input.txt output.txt`    | `25  4  4  1`          |
 
 
 ---
