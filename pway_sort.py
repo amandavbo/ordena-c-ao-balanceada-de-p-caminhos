@@ -10,13 +10,20 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
     memoria = []
     congelados = []
 
+    #cria um iterador de números do arquivo -> independentemente de quebra de linha
+    def numeros_do_arquivo(f):
+        for linha in f:
+            for num in linha.strip().split():
+                yield int(num)
+
     with open(arquivo_entrada, 'r') as f:
-        #leitura inicial de p registros
+        numeros = numeros_do_arquivo(f)
+        # leitura inicial de p registros
         for _ in range(p):
-            linha = f.readline()
-            if not linha:
+            try:
+                memoria.append(next(numeros))
+            except StopIteration:
                 break
-            memoria.append(int(linha.strip()))
 
         memoria.sort()
         heap = [(val, False) for val in memoria]
@@ -33,11 +40,11 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
                 run_temp.write(f"{menor}\n")
                 atual = menor
 
-                proximo = f.readline()
-                if not proximo:
+                try:
+                    valor = next(numeros)
+                except StopIteration:
                     continue
 
-                valor = int(proximo.strip())
                 if valor >= atual:
                     heapq.heappush(heap, (valor, False))
                 else:
@@ -94,7 +101,7 @@ def intercalar_runs(runs, p):
 
 def contar_registros(arquivo):
     with open(arquivo, 'r') as f:
-        return sum(1 for _ in f)
+        return sum(1 for linha in f for _ in linha.strip().split())
 
 def main():
     if len(sys.argv) != 4:
@@ -115,8 +122,8 @@ def main():
 
     os.rename(arquivo_ordenado, arquivo_saida)
 
-    print("#Regs Ways #Runs #Parses")
-    print(f"{total_regs}    {p}    {len(runs)}     {total_passes}")
+    print("#Regs   Ways   #Runs   #Parses")
+    print(f"{total_regs}      {p}      {len(runs)}       {total_passes}")
 
 if __name__ == "__main__":
     main()
