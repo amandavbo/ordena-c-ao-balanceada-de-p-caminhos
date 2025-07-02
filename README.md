@@ -1,13 +1,8 @@
 # 📦 Ordenação Balanceada de p-Caminhos
 
 Trabalho da disciplina **MATA54 - Estrutura de Dados e Algoritmos II – 2025.1**  
-Instituto de Computação – Universidade Federal da Bahia (UFBA)  
-Prof. George Lima  
-Aluna: Amanda Vilas Boas Oliveira
-
 
 ---
-
 ## 🎯 Objetivo
 
 Consolidar o conhecimento sobre **ordenação externa**, implementando uma solução prática capaz de ordenar arquivos contendo inteiros, respeitando limites de memória e de arquivos simultaneamente abertos. O programa:
@@ -112,27 +107,28 @@ python pway_sort.py 3 input.txt output.txt
 
 ---
 
+
 ## ✅ Critérios
 
-- ✅ Ordenação **sem uso de sort interno** exceto no buffer inicial;
+- ✅ Ordenação **sem uso de sort interno** (nem mesmo no buffer inicial, apenas heap);
 - ✅ Leitura e escrita apenas via **arquivos externos**;
 - ✅ Compatível com arquivos grandes;
-- ❌ Não usar estruturas que armazenem tudo na RAM;
-- ❌ Não usar bibliotecas de ordenação pronta.
+- ✅ Não usa estruturas que armazenem tudo na RAM;
+- ✅ Não usa bibliotecas de ordenação pronta;
 
 
 ---
 
 ## 🔬 Testes Esperados
 
-Utilizando o mesmo `input.txt` com 25 valores:
+Utilizando o `input.txt` com 25 valores e o `input2.txt` com 10.000 valores:
 
 | Comando                                  | Saída Esperada        |
 |------------------------------------------|------------------------|
-| `python pway_sort.py 2 input.txt output.txt`    | `25  2  7  3`          |
-| `python pway_sort.py 3 input.txt output.txt`    | `25  3  5  2`          |
-| `python pway_sort.py 4 input.txt output.txt`    | `25  4  4  1`          |
-| `python pway_sort.py 3 input2.txt output.txt`    | `10000  3  1667  7 `          |
+| `python pway_sort.py 2 input.txt output1.txt`    | `25  2  7  3`          |
+| `python pway_sort.py 3 input.txt output2.txt`    | `25  3  5  2`          |
+| `python pway_sort.py 4 input.txt output3.txt`    | `25  4  4  1`          |
+| `python pway_sort.py 3 input2.txt output4.txt`    | `10000  3  1667  7 `          |
 
 
 ---

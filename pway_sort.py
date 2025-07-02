@@ -13,8 +13,7 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
             yield from map(int, linha.split())
 
     start_time = time.time()
-    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
-    os.makedirs(temp_dir, exist_ok=True)
+    temp_dir = None
 
     with open(arquivo_entrada, 'r', buffering=1024*1024) as f:
         numeros = numeros_do_arquivo(f)
@@ -25,7 +24,6 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
             except StopIteration:
                 break
 
-        memoria = sorted(memoria)
         heap = list(memoria)
         heapq.heapify(heap)
 
@@ -34,7 +32,7 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
         congelados = array.array('i')
 
         while heap:
-            run_temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024, dir=temp_dir)
+            run_temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024)
             runs.append(run_temp.name)
             write = run_temp.write
             heappop = heapq.heappop
@@ -58,7 +56,7 @@ def gerar_runs_ordenadas(arquivo_entrada, p):
             heapq.heapify(heap)
             run_temp.close()
 
-    print(f"Tempo para gerar runs ordenadas: {time.time() - start_time:.2f} segundos")
+    # print(f"Tempo para gerar runs ordenadas: {time.time() - start_time:.2f} segundos")
     return runs
 
 def intercalar_grupo(grupo, temp_dir, output_list, index):
@@ -70,7 +68,7 @@ def intercalar_grupo(grupo, temp_dir, output_list, index):
         if linha:
             heapq.heappush(heap, (int(linha), idx))
 
-    temp_out = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024, dir=temp_dir)
+    temp_out = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024)
     output_list[index] = temp_out.name
     write = temp_out.write
     heappush = heapq.heappush
@@ -93,8 +91,7 @@ def intercalar_runs(runs, p):
     parse_count = 0
     start_time = time.time()
 
-    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
-    os.makedirs(temp_dir, exist_ok=True)
+    temp_dir = None
 
     while len(runs) > 1:
         threads = []
@@ -103,7 +100,7 @@ def intercalar_runs(runs, p):
         for i in range(0, len(runs), p):
             grupo = runs[i:i+p]
             index = i // p
-            t = threading.Thread(target=intercalar_grupo, args=(grupo, temp_dir, novos_runs, index))
+            t = threading.Thread(target=intercalar_grupo, args=(grupo, None, novos_runs, index))
             threads.append(t)
             t.start()
 
@@ -113,7 +110,7 @@ def intercalar_runs(runs, p):
         parse_count += 1
         runs = novos_runs
 
-    print(f"Tempo para intercalar runs: {time.time() - start_time:.2f} segundos")
+    # print(f"Tempo para intercalar runs: {time.time() - start_time:.2f} segundos")
     return runs[0], parse_count
 
 def contar_registros(arquivo):
