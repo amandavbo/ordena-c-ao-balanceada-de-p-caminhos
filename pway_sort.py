@@ -2,106 +2,126 @@ import heapq
 import sys
 import tempfile
 import os
+import time
+import array
+import threading
+from queue import PriorityQueue
 
-#gera runs iniciais com substituicao por selecao
 def gerar_runs_ordenadas(arquivo_entrada, p):
-    heap = []
-    runs = []
-    memoria = []
-    congelados = []
-
-    #cria um iterador de números do arquivo -> independentemente de quebra de linha
     def numeros_do_arquivo(f):
         for linha in f:
-            for num in linha.strip().split():
-                yield int(num)
+            yield from map(int, linha.split())
 
-    with open(arquivo_entrada, 'r') as f:
+    start_time = time.time()
+    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
+
+    with open(arquivo_entrada, 'r', buffering=1024*1024) as f:
         numeros = numeros_do_arquivo(f)
-        # leitura inicial de p registros
+        memoria = array.array('i')
         for _ in range(p):
             try:
                 memoria.append(next(numeros))
             except StopIteration:
                 break
 
-        memoria.sort()
-        heap = [(val, False) for val in memoria]
+        memoria = sorted(memoria)
+        heap = list(memoria)
         heapq.heapify(heap)
 
+        runs = []
         atual = float('-inf')
+        congelados = array.array('i')
 
         while heap:
-            run_temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+            run_temp = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024, dir=temp_dir)
             runs.append(run_temp.name)
+            write = run_temp.write
+            heappop = heapq.heappop
+            heappush = heapq.heappush
 
             while heap:
-                menor, congelado = heapq.heappop(heap)
-                run_temp.write(f"{menor}\n")
+                menor = heappop(heap)
+                write(f"{menor}\n")
                 atual = menor
-
                 try:
                     valor = next(numeros)
+                    if valor >= atual:
+                        heappush(heap, valor)
+                    else:
+                        congelados.append(valor)
                 except StopIteration:
                     continue
 
-                if valor >= atual:
-                    heapq.heappush(heap, (valor, False))
-                else:
-                    congelados.append((valor, True))
-
-            heap = congelados
-            congelados = []
+            heap = list(congelados)
+            congelados = array.array('i')
             heapq.heapify(heap)
-
             run_temp.close()
 
+    print(f"Tempo para gerar runs ordenadas: {time.time() - start_time:.2f} segundos")
     return runs
 
+def intercalar_grupo(grupo, temp_dir, output_list, index):
+    arquivos = [open(r, 'r', buffering=1024*1024) for r in grupo]
+    heap = []
 
-#intercala p arquivos usando heap minima
+    for idx, arq in enumerate(arquivos):
+        linha = arq.readline()
+        if linha:
+            heapq.heappush(heap, (int(linha), idx))
+
+    temp_out = tempfile.NamedTemporaryFile(mode='w+t', delete=False, buffering=1024*1024, dir=temp_dir)
+    output_list[index] = temp_out.name
+    write = temp_out.write
+    heappush = heapq.heappush
+    heappop = heapq.heappop
+
+    while heap:
+        menor, origem = heappop(heap)
+        write(f"{menor}\n")
+        linha = arquivos[origem].readline()
+        if linha:
+            heappush(heap, (int(linha), origem))
+
+    temp_out.close()
+    for arq in arquivos:
+        arq.close()
+    for r in grupo:
+        os.remove(r)
+
 def intercalar_runs(runs, p):
     parse_count = 0
+    start_time = time.time()
+
+    temp_dir = os.path.join(os.path.dirname(__file__), 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
 
     while len(runs) > 1:
-        novos_runs = []
+        threads = []
+        novos_runs = [None] * ((len(runs) + p - 1) // p)
 
         for i in range(0, len(runs), p):
             grupo = runs[i:i+p]
-            arquivos = [open(r, 'r') for r in grupo]
-            heap = []
+            index = i // p
+            t = threading.Thread(target=intercalar_grupo, args=(grupo, temp_dir, novos_runs, index))
+            threads.append(t)
+            t.start()
 
-            for idx, arq in enumerate(arquivos):
-                linha = arq.readline()
-                if linha:
-                    heapq.heappush(heap, (int(linha.strip()), idx))
+        for t in threads:
+            t.join()
 
-            temp_out = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-            novos_runs.append(temp_out.name)
-
-            while heap:
-                menor, origem = heapq.heappop(heap)
-                temp_out.write(f"{menor}\n")
-                linha = arquivos[origem].readline()
-                if linha:
-                    heapq.heappush(heap, (int(linha.strip()), origem))
-
-            temp_out.close()
-            for arq in arquivos:
-                arq.close()
-            for r in grupo:
-                os.remove(r)
-
-        parse_count += 1  
-
+        parse_count += 1
         runs = novos_runs
 
+    print(f"Tempo para intercalar runs: {time.time() - start_time:.2f} segundos")
     return runs[0], parse_count
 
-
 def contar_registros(arquivo):
+    total = 0
     with open(arquivo, 'r') as f:
-        return sum(1 for linha in f for _ in linha.strip().split())
+        for linha in f:
+            total += len(linha.split())
+    return total
 
 def main():
     if len(sys.argv) != 4:
@@ -120,6 +140,8 @@ def main():
     runs = gerar_runs_ordenadas(arquivo_entrada, p)
     arquivo_ordenado, total_passes = intercalar_runs(runs, p)
 
+    if os.path.exists(arquivo_saida):
+        os.remove(arquivo_saida)
     os.rename(arquivo_ordenado, arquivo_saida)
 
     print("#Regs   Ways   #Runs   #Parses")
