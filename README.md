@@ -161,6 +161,31 @@ python pway_sort.py 3 input.txt output.txt
 
 ---
 
+
+## ℹ️ Observação sobre a Leitura dos Dados
+
+Inicialmente, o programa foi implementado para ler apenas arquivos em que cada número inteiro estava em uma linha separada, conforme o exemplo clássico de entrada:
+
+```
+18
+7
+3
+...
+```
+
+No entanto, após o professor fornecer o arquivo `input2.txt` (com 10.000 inteiros separados por espaço em uma única linha), a implementação foi adaptada para aceitar **qualquer formato de entrada** em que os inteiros estejam separados por espaço ou quebra de linha, como:
+
+```
+18 7 3 24 15 5 20 ...
+```
+
+### 🆕 Como funciona a nova leitura
+
+- O programa lê cada linha do arquivo e, para cada linha, separa todos os inteiros usando `linha.split()`.
+
+
+---
+
 ## 🧠 Lógica de Implementação
 
 - **Heap mínima** é usada tanto para gerar runs iniciais quanto para intercalar arquivos;
