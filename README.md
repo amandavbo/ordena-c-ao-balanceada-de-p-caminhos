@@ -114,7 +114,8 @@ python pway_sort.py 3 input.txt output.txt
 - ✅ Leitura e escrita apenas via **arquivos externos**;
 - ✅ Compatível com arquivos grandes;
 - ✅ Não usa estruturas que armazenem tudo na RAM;
-- ✅ Não usa bibliotecas de ordenação pronta;
+- ✅ Não usa bibliotecas de ordenação pronta (a estrutura de dados Heap foi implementada do zero);
+
 
 
 ---
