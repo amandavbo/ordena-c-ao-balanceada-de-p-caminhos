@@ -5,7 +5,7 @@ Trabalho da disciplina **MATA54 - Estrutura de Dados e Algoritmos II – 2025.1*
 ---
 ## 🎯 Objetivo
 
-Consolidar o conhecimento sobre **ordenação externa**, implementando uma solução prática capaz de ordenar arquivos contendo inteiros, respeitando limites de memória e de arquivos simultaneamente abertos. O programa:
+Consolidar o conhecimento sobre **ordenação externa**, implementando uma solução capaz de ordenar arquivos contendo inteiros, respeitando limites de memória e de arquivos simultaneamente abertos. O programa:
 
 - 📂 Ordena números inteiros de um arquivo de entrada;
 - 🧠 Usa no máximo `p` registros na memória principal;
@@ -110,7 +110,7 @@ python pway_sort.py 3 input.txt output.txt
 
 ## ✅ Critérios
 
-- ✅ Ordenação **sem uso de sort interno** (nem mesmo no buffer inicial, apenas heap);
+- ✅ Ordenação **sem uso de sort interno**;
 - ✅ Leitura e escrita apenas via **arquivos externos**;
 - ✅ Compatível com arquivos grandes;
 - ✅ Não usa estruturas que armazenem tudo na RAM;
@@ -164,7 +164,7 @@ python pway_sort.py 3 input.txt output.txt
 
 ## ℹ️ Observação sobre a Leitura dos Dados
 
-Inicialmente, o programa foi implementado para ler apenas arquivos em que cada número inteiro estava em uma linha separada, conforme o exemplo clássico de entrada:
+Inicialmente, o programa foi implementado para ler apenas arquivos em que cada número inteiro estava em uma linha separada, conforme o primeiro exemplo de entrada:
 
 ```
 18
